@@ -1,3 +1,6 @@
+# MediaPipe model files (large binary, download via pip/curl on setup)
+backend/models/*.task
+
 # Environment variables - NEVER commit these
 .env
 .env.local

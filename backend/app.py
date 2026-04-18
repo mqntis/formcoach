@@ -19,11 +19,13 @@ def create_app():
     from routes.auth import auth_bp
     from routes.sessions import sessions_bp
     from routes.upload import upload_bp
+    from routes.joints import joints_bp
 
     app.register_blueprint(health_bp)
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(sessions_bp, url_prefix="/api/sessions")
     app.register_blueprint(upload_bp, url_prefix="/api/upload")
+    app.register_blueprint(joints_bp, url_prefix="/api/extract-joints")
 
     return app
 

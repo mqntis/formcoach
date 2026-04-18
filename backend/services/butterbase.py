@@ -108,6 +108,23 @@ def request_upload_url(filename: str, content_type: str, size_bytes: int) -> dic
     return resp.json()
 
 
+def upload_file_server_side(file_bytes: bytes, filename: str, content_type: str) -> str:
+    """
+    Upload a file from the backend directly to Butterbase storage.
+    Returns the objectId to persist in the database.
+    """
+    presigned = request_upload_url(filename, content_type, len(file_bytes))
+    put_resp = requests.put(
+        presigned["uploadUrl"],
+        data=file_bytes,
+        headers={"Content-Type": content_type},
+        timeout=120,
+    )
+    if not put_resp.ok:
+        raise ButterbaseError(put_resp.status_code, f"Storage PUT failed: {put_resp.text}")
+    return presigned["objectId"]
+
+
 def request_download_url(object_id: str) -> dict:
     """Returns a fresh presigned downloadUrl for a stored file."""
     resp = requests.get(
