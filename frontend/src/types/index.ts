@@ -1,16 +1,17 @@
-export interface User {
-  id: number;
-  email: string;
-}
-
 export interface Session {
-  id: number;
-  title: string;
-  notes?: string;
+  session_id: string;
+  original_video_url: string | null;
+  raw_seadance_url: string | null;
+  conditioned_seadance_url: string | null;
+  joint_data: Record<string, unknown> | null;
+  correction_text: string | null;
+  verified_correction: boolean;
+  phone_number: string | null;
   created_at: string;
 }
 
-export interface AuthResponse {
-  access_token: string;
-  user: User;
+export interface UploadUrlResponse {
+  upload_url: string;
+  object_id: string;
+  expires_in: number;
 }
