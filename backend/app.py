@@ -1,11 +1,8 @@
-import os
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
-from dotenv import load_dotenv
-
-load_dotenv()
+import config
 
 db = SQLAlchemy()
 jwt = JWTManager()
@@ -14,12 +11,12 @@ jwt = JWTManager()
 def create_app():
     app = Flask(__name__)
 
-    app.config["SECRET_KEY"] = os.environ["FLASK_SECRET_KEY"]
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///formcoach.db")
+    app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
+    app.config["SQLALCHEMY_DATABASE_URI"] = config.DATABASE_URL
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["JWT_SECRET_KEY"] = os.environ["JWT_SECRET_KEY"]
+    app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
 
-    CORS(app, origins=[os.environ.get("FRONTEND_URL", "http://localhost:3000")])
+    CORS(app, origins=[config.FRONTEND_URL])
 
     db.init_app(app)
     jwt.init_app(app)
@@ -40,4 +37,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=os.environ.get("FLASK_DEBUG", "0") == "1")
+    app.run(debug=config.FLASK_DEBUG)
