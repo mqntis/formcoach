@@ -48,12 +48,16 @@ def list_sessions(phone_number: str | None = None, limit: int = 50, offset: int 
 
 def get_session(session_id: str) -> dict:
     resp = requests.get(
-        f"{config.BUTTERBASE_API_URL}/sessions/{session_id}",
+        f"{config.BUTTERBASE_API_URL}/sessions",
         headers=_headers(),
+        params={"session_id": f"eq.{session_id}", "limit": 1},
         timeout=10,
     )
     _raise_for(resp)
-    return resp.json()
+    rows = resp.json()
+    if not rows:
+        raise ButterbaseError(404, f"Session '{session_id}' not found")
+    return rows[0]
 
 
 def create_session(data: dict) -> dict:
@@ -79,8 +83,9 @@ def update_session(session_id: str, data: dict) -> dict:
     }
     payload = {k: v for k, v in data.items() if k in allowed}
     resp = requests.patch(
-        f"{config.BUTTERBASE_API_URL}/sessions/{session_id}",
+        f"{config.BUTTERBASE_API_URL}/sessions",
         headers=_headers(),
+        params={"session_id": f"eq.{session_id}"},
         json=payload,
         timeout=10,
     )

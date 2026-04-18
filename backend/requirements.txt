@@ -4,6 +4,7 @@ flask-jwt-extended==4.7.1
 python-dotenv==1.0.1
 requests==2.32.3
 openai==1.76.0
+anthropic>=0.50.0
 mediapipe>=0.10.30
 opencv-python>=4.10.0
 pytest==8.3.5

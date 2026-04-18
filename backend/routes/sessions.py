@@ -4,6 +4,8 @@ from services.butterbase import (
     request_download_url, ButterbaseError,
 )
 
+results_bp = Blueprint("results", __name__)
+
 sessions_bp = Blueprint("sessions", __name__)
 
 
@@ -49,6 +51,41 @@ def patch_session(session_id: str):
         return jsonify(row)
     except ButterbaseError as e:
         return _error(str(e), e.status_code)
+
+
+@results_bp.get("/<session_id>")
+def get_results(session_id: str):
+    """
+    GET /api/get-results/<session_id>
+    Returns all session fields plus fresh presigned download URLs for stored video object IDs.
+    """
+    try:
+        session = get_session(session_id)
+    except ButterbaseError as e:
+        return _error(str(e), e.status_code)
+
+    video_fields = ("original_video_url", "raw_seadance_url", "conditioned_seadance_url")
+    download_urls = {}
+    for field in video_fields:
+        object_id = session.get(field)
+        if object_id:
+            try:
+                result = request_download_url(object_id)
+                download_urls[field] = result.get("downloadUrl")
+            except ButterbaseError:
+                download_urls[field] = None
+
+    return jsonify({
+        "session_id":               session.get("session_id"),
+        "phone_number":             session.get("phone_number"),
+        "original_video_url":       download_urls.get("original_video_url"),
+        "raw_seadance_url":         session.get("raw_seadance_url"),
+        "conditioned_seadance_url": session.get("conditioned_seadance_url"),
+        "joint_data":               session.get("joint_data"),
+        "correction_text":          session.get("correction_text"),
+        "verified_correction":      session.get("verified_correction"),
+        "created_at":               session.get("created_at"),
+    })
 
 
 @sessions_bp.get("/<session_id>/download-url/<field>")
